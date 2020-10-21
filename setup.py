@@ -38,6 +38,8 @@ setup(
     ],
     tests_require=[
         'pytest',
+        'numpy',
+        'scikit-learn',
     ]
 )
 

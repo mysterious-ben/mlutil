@@ -63,9 +63,9 @@ class TimeSeriesSplit:
                 start_train_idx = max(end_train_idx - train_period_len + 1, leave_n_first_points)
             else:
                 start_train_idx = leave_n_first_points
-            train_ids = range(start_train_idx,
+            train_ids = slice(start_train_idx,
                               min(end_train_idx, last_idx) + 1)
-            test_ids = range(end_train_idx + prediction_lag + 1,
+            test_ids = slice(end_train_idx + prediction_lag + 1,
                              min(end_train_idx + prediction_lag + n_predictions, last_idx) + 1)
             yield train_ids, test_ids
 
