@@ -34,11 +34,12 @@ setup(
     setup_requires=[
         'pytest-runner',
         'setuptools',
+        'numpy',
+        'statsmodels',
+        'scikit-learn',
     ],
     tests_require=[
         'pytest',
-        'numpy',
-        'scikit-learn',
     ]
 )
 
@@ -47,3 +48,4 @@ setup(
 # python setup.py sdist bdist_wheel
 # twine check dist/*
 # twine upload dist/*
+import statsmodels.gam
