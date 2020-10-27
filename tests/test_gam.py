@@ -2,7 +2,7 @@ import numpy as np
 from mlutil.model import GAM
 
 
-def test_gam():
+def test_GAM():
     m = GAM()
     X = np.arange(20)[:, None]
     y = np.arange(20) + np.random.normal(scale=0.1, size=20)
