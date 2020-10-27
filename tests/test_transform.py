@@ -5,7 +5,7 @@ from mlutil.transform import SigmaClipper, ColumnSelector
 
 
 @pytest.mark.parametrize(
-    'X, X_new, sigma',
+    'X, X_new, sigma, sigma_low, sigma_high',
     [
         (
             pd.DataFrame({
@@ -16,7 +16,18 @@ from mlutil.transform import SigmaClipper, ColumnSelector
                 'a': [np.nan, -1., 2., 1., 1., 4.],
                 'b': [-2., 1., 3., 2., -5, np.nan],
             }),
-            3.,
+            3., None, None,
+        ),
+        (
+            pd.DataFrame({
+                'a': [np.nan, -1., 2., 1., 1., 302.],
+                'b': [-2., 1., 3., 2., -201, np.nan],
+            }),
+            pd.DataFrame({
+                'a': [np.nan, -1., 2., 1., 1., 4.],
+                'b': [-2., 1., 3., 2., -5, np.nan],
+            }),
+            1., 3., 3.,
         ),
         (
             np.array([
@@ -27,12 +38,12 @@ from mlutil.transform import SigmaClipper, ColumnSelector
                 [np.nan, -1., 2., 1., 1., 4.],
                 [-2., 1., 3., 2., -5, np.nan],
             ]).T,
-            3.,
+            3., None, None,
         ),
     ]
 )
-def test_SigmaClipper(X, X_new, sigma):
-    t = SigmaClipper(low_sigma=sigma, high_sigma=sigma)
+def test_SigmaClipper(X, X_new, sigma, sigma_low, sigma_high):
+    t = SigmaClipper(sigma=sigma, low_sigma=sigma_low, high_sigma=sigma_high)
     X_new_ = t.fit_transform(X)
     if isinstance(X, np.ndarray):
         np.testing.assert_allclose(X_new_, X_new)
