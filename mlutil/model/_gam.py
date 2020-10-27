@@ -22,7 +22,7 @@ class GAM(RegressorMixin, BaseEstimator):
         splines: str = 'cyclic_cubic',
         df: Union[int, List[int]] = 5,
         degree: Union[int, List[int]] = 3,
-        alpha: Union[float, List[float]] = 0.1,
+        alpha: Union[float, List[float]] = 0.01,
         clip_X: bool = False,
     ):
         self.df = df

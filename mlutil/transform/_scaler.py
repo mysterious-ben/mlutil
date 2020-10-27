@@ -14,7 +14,7 @@ class SigmaClipper(TransformerMixin, BaseEstimator):
     :param mean_fun: 'median' | 'mean'
     """
 
-    def __init__(self, low_sigma: float, high_sigma: float, mean_fun: str = 'median'):
+    def __init__(self, low_sigma: float = 3., high_sigma: float = 3., mean_fun: str = 'median'):
         self.low_sigma = low_sigma
         self.high_sigma = high_sigma
         self.mean_fun = mean_fun
