@@ -12,6 +12,8 @@ class GAM(RegressorMixin, BaseEstimator):
     :param df: number of spline basis functions (= knots)
         if splines='cyclic_cubic', must be set to 3 (default value)
     :param degree: degree of splines
+    :param family: distribution gamily (default: gaussian)
+        See statsmodels.api.families
     :param alpha: penalization weight
     :param clip_X: if true, clip X values by its min and max during training
         use for 'b' splines, which do not have extrapolation
@@ -22,11 +24,13 @@ class GAM(RegressorMixin, BaseEstimator):
         splines: str = 'cyclic_cubic',
         df: Union[int, List[int]] = 5,
         degree: Union[int, List[int]] = 3,
+        family=None,
         alpha: Union[float, List[float]] = 0.01,
         clip_X: bool = False,
     ):
         self.df = df
         self.degree = degree
+        self.family = family
         self.alpha = alpha
         self.splines = splines
         self.clip_X = clip_X
@@ -45,7 +49,7 @@ class GAM(RegressorMixin, BaseEstimator):
             raise ValueError(self.splines)
         self.x_min_ = np.min(X, axis=0)
         self.x_max_ = np.max(X, axis=0)
-        self.estimator_ = GLMGam(y, X, smoother=self.splines_, alpha=alpha)
+        self.estimator_ = GLMGam(y, X, smoother=self.splines_, family=self.family, alpha=alpha)
         self.res_ = self.estimator_.fit()
         return self
     
