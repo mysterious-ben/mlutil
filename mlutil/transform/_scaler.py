@@ -31,16 +31,52 @@ class SigmaClipper(TransformerMixin, BaseEstimator):
         assert self.high_sigma_ >= 0
         
         if self.mean_fun == 'median':
-            mean = np.nanmedian
+            meanf = np.nanmedian
         elif self.mean_fun == 'mean':
-            mean = np.nanmean
+            meanf = np.nanmean
         else:
             raise ValueError(self.mean_fun)
         X_ = np.asarray(X)
-        self.mean_ = mean(X_, axis=0)
-        self.std_ = np.sqrt(mean((X_ - self.mean_) ** 2, axis=0))
+        self.mean_ = meanf(X_, axis=0)
+        self.std_ = np.sqrt(meanf((X_ - self.mean_) ** 2, axis=0))
         self.high_ = self.mean_ + self.low_sigma_ * self.std_
         self.low_ = self.mean_ - self.high_sigma_ * self.std_
+        return self
+        
+    def transform(self, X: Union[np.array, pd.DataFrame]) -> Union[np.array, pd.DataFrame]:
+        if isinstance(X, pd.DataFrame):
+            X = X.clip(self.low_, self.high_, axis=1)
+        else:
+            X = np.clip(X, self.low_[np.newaxis, :], self.high_[np.newaxis, :])
+        return X
+
+
+class QuantileClipper(TransformerMixin, BaseEstimator):
+    """Clip values exceeding specified quantile levels times a factor
+    
+    :param factor: multiplier
+    :param low_quantile: low quantile level
+    :param high_quantile: high quantile level
+    :param mean_fun: 'median' | 'mean'
+    """
+
+    def __init__(self, factor: Optional[float] = 3.,
+                 low_quantile: Optional[float] = 0.9,
+                 high_quantile: Optional[float] = 0.1,
+                 mean_fun: str = 'median'):
+        self.factor = factor
+        self.low_quantile = low_quantile
+        self.high_quantile = high_quantile
+        self.mean_fun = mean_fun
+
+    def fit(self, X: Union[np.array, pd.DataFrame], y=None):
+        assert self.factor >= 0
+        X_ = np.asarray(X)
+        self.mean_ = np.nanmedian(X_, axis=0)
+        self.high_q_ = np.nanquantile(X_, self.high_quantile, axis=0)
+        self.low_q_ = np.nanquantile(X_, self.low_quantile, axis=0)
+        self.high_ = (self.high_q_ - self.mean_) * self.factor + self.mean_
+        self.low_ = (self.low_q_ - self.mean_) * self.factor + self.mean_
         return self
         
     def transform(self, X: Union[np.array, pd.DataFrame]) -> Union[np.array, pd.DataFrame]:

@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 import pandas as pd
-from mlutil.transform import SigmaClipper, ColumnSelector
+from mlutil.transform import SigmaClipper, QuantileClipper, ColumnSelector
 
 
 @pytest.mark.parametrize(
@@ -44,6 +44,44 @@ from mlutil.transform import SigmaClipper, ColumnSelector
 )
 def test_SigmaClipper(X, X_new, sigma, sigma_low, sigma_high):
     t = SigmaClipper(sigma=sigma, low_sigma=sigma_low, high_sigma=sigma_high)
+    X_new_ = t.fit_transform(X)
+    if isinstance(X, np.ndarray):
+        np.testing.assert_allclose(X_new_, X_new)
+    elif isinstance(X, pd.DataFrame):
+        np.testing.assert_allclose(X_new_.values, X_new.values)
+    else:
+        raise TypeError(type(X))
+
+
+@pytest.mark.parametrize(
+    'X, X_new, factor, q_low, q_high',
+    [
+        (
+            pd.DataFrame({
+                'a': [np.nan, -1., 2., 0, 1., 302.],
+                'b': [-2., 1., 3., 2., -201, np.nan],
+            }),
+            pd.DataFrame({
+                'a': [np.nan, -1., 2., 0, 1., 4.],
+                'b': [-2., 1., 3., 2., -8., np.nan],
+            }),
+            3., .25, .75,
+        ),
+        (
+            np.array([
+                [np.nan, -1., 2., 0, 1., 302.],
+                [-2., 1., 3., 2., -201, np.nan],
+            ]).T,
+            np.array([
+                [np.nan, -1., 2., 0, 1., 4.],
+                [-2., 1., 3., 2., -8., np.nan],
+            ]).T,
+            3., .25, .75,
+        ),
+    ]
+)
+def test_QuantileClipper(X, X_new, factor, q_low, q_high):
+    t = QuantileClipper(factor=factor, low_quantile=q_low, high_quantile=q_high)
     X_new_ = t.fit_transform(X)
     if isinstance(X, np.ndarray):
         np.testing.assert_allclose(X_new_, X_new)
