@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
 import pandas as pd
+from sklearn.impute import SimpleImputer
 from mlutil.transform import SigmaClipper, QuantileClipper, ColumnSelector
 
 
@@ -92,6 +93,37 @@ def test_QuantileClipper(X, X_new, factor, q_low, q_high):
 
 
 @pytest.mark.parametrize(
+    'columns, regex, like',
+    [
+        (['a_dd', 'c_dd', 'd_dd'], None, None),
+        (None, r'\_dd$', None),
+        (None, None, r'_dd'),
+    ]
+)
+def test_ColumnSelector(columns, regex, like):
+    df = pd.DataFrame({
+        'a_dd': [1., 2., 3., np.nan],
+        'b_ff': [1., 2., 3., np.nan],
+        'c_dd': [1., 2., 3., np.nan],
+        'd_dd': [1., 2., 3., np.nan],
+    })
+    expected = pd.DataFrame({
+        'a_dd': [1., 2., 3., 0],
+        'b_ff': [1., 2., 3., np.nan],
+        'c_dd': [1., 2., 3., 0],
+        'd_dd': [1., 2., 3., 0],
+    })
+    t = ColumnSelector(
+        SimpleImputer(strategy='constant', fill_value=0),
+        columns=columns,
+        columns_like=like,
+        columns_regex=regex,
+    )
+    actual = t.fit_transform(df)
+    pd.testing.assert_frame_equal(expected, actual)
+
+
+@pytest.mark.parametrize(
     'X, X_new, columns',
     [
         (
@@ -118,7 +150,7 @@ def test_QuantileClipper(X, X_new, factor, q_low, q_high):
         ),
     ]
 )
-def test_ColumnSelector(X, X_new, columns):
+def test_ColumnSelector_with_SigmaClipper(X, X_new, columns):
     t = ColumnSelector(
         SigmaClipper(low_sigma=3, high_sigma=3),
         columns=columns,

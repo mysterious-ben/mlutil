@@ -4,21 +4,38 @@ from typing import Optional, List
 
 
 class ColumnSelector(TransformerMixin, BaseEstimator):
-    """Transformer affecting only selected columns"""
+    """Transformer affecting only selected columns
+    
+    :param transformer: scikit-learn transformer
+    :param columns: select specific DataFrame columns
+    :param columns_regex: select DataFrame columns via regex
+        mutually exclusive with parameters `columns` and `columns_like`
+    :param columns_like: select DataFrame columns via like
+        mutually exclusive with parameters `columns` and `columns_regex`
+    """
 
     def __init__(self, transformer=None,
                  columns: Optional[List[str]] = None,
+                 columns_regex: Optional[str] = None,
+                 columns_like: Optional[str] = None,
                  remainder: str = 'passthrough',
                  copy: bool = True):
         self.transformer = transformer
         self.columns = columns
+        self.columns_regex = columns_regex
+        self.columns_like = columns_like
         self.remainder = remainder
         self.copy = copy
 
     def fit(self, X: pd.DataFrame, y=None):
         if self.transform is None:
             return self
-        self.columns_ = self.columns if self.columns is not None else X.columns
+        if (self.columns is None) and (self.columns_regex is None) and (self.columns_like is None):
+            self.columns_ = X.columns
+        else:
+            self.columns_ = X.filter(
+                items=self.columns, regex=self.columns_regex, like=self.columns_like, axis=1
+            ).columns
         self.transformer.fit(X=X[self.columns_], y=y)
         return self
 
