@@ -35,6 +35,7 @@ setup(
         'pytest-runner',
         'setuptools',
         'numpy',
+        'pandas',
         'statsmodels',
         'scikit-learn',
     ],
