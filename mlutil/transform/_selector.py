@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.base import TransformerMixin, BaseEstimator
-from typing import Optional, List, Literal
+from typing import Optional, List
 
 
 class ColumnSelector(TransformerMixin, BaseEstimator):
@@ -25,17 +25,21 @@ class ColumnSelector(TransformerMixin, BaseEstimator):
     :param new_columns_prefix: prefix for new columns
         used if `infer_new_columns` = "attr" | "num"
     :param remainder: pass through or drop remaining columns
+        "passthrough" = leave the remaining columns
+        "drop" = drop the remaining columns
     """
 
     def __init__(self, transformer=None,
                  columns: Optional[List[str]] = None,
                  columns_regex: Optional[str] = None,
                  columns_like: Optional[str] = None,
-                 infer_new_columns: Literal['same', 'attr', 'same_attr', 'num', 'auto'] = 'same',
+                #  infer_new_columns: Literal['same', 'attr', 'same_attr', 'num', 'auto'] = 'same',
+                 infer_new_columns: str = 'same',
                  new_columns_attr: Optional[str] = None,
                  new_columns_prefix: Optional[str] = None,
                  override_dataframe_columns: bool = False,
-                 remainder: Literal['passthrough', 'drop'] = 'passthrough',
+                #  remainder: Literal['passthrough', 'drop'] = 'passthrough',
+                 remainder: str = 'passthrough',
                  copy: bool = True):
         self.transformer = transformer
         self.columns = columns
