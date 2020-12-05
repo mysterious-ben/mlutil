@@ -63,7 +63,7 @@ class ColumnSelector(TransformerMixin, BaseEstimator):
         elif self.remainder == 'drop':
             self.columns_l_ = []
         else:
-            raise ValueError(f'{self.remainder = }')
+            raise ValueError(f'{self.remainder}')
         assert (set(self.columns_l_) | set(self.columns_t_)).issubset(set(self.columns_))
         self.transformer.fit(X=X[self.columns_t_], y=y)
         return self
@@ -71,17 +71,17 @@ class ColumnSelector(TransformerMixin, BaseEstimator):
     def _infer_new_column_names(self, X_t: np.array) -> List[str]:
         actual = X_t.shape[1]
         if self.infer_new_columns == 'auto':
-            raise NotImplementedError(f'{self.infer_new_columns = }')
+            raise NotImplementedError(f'{self.infer_new_columns}')
         if self.infer_new_columns == 'same':
             expected = len(self.columns_t_)
             if expected != actual:
-                raise ValueError(f'Wrong number of transformed columns: {expected = } vs {actual = }')
+                raise ValueError(f'Wrong number of transformed columns: {expected} vs {actual}')
             new_columns_t_ = self.columns_t_
         elif self.infer_new_columns == 'attr':
             colattr = getattr(self.transformer, self.new_columns_attr)
             expected = len(colattr)
             if expected != actual:
-                raise ValueError(f'Wrong number of transformed columns: {expected = } vs {actual = }')
+                raise ValueError(f'Wrong number of transformed columns: {expected} vs {actual}')
             prefix = ('_'.join(self.columns_t_) if self.new_columns_prefix is None
                       else self.new_columns_prefix)
             new_columns_t_ = [prefix + '_' + str(x) for x in colattr]
@@ -89,7 +89,7 @@ class ColumnSelector(TransformerMixin, BaseEstimator):
             colattr = getattr(self.transformer, self.new_columns_attr)
             expected = sum(len(x) for x in colattr)
             if expected != actual:
-                raise ValueError(f'Wrong number of transformed columns: {expected = } vs {actual = }')
+                raise ValueError(f'Wrong number of transformed columns: {expected} vs {actual}')
             if len(self.columns_t_) != len(colattr):
                 raise ValueError(f'Wrong number of columns: {len(self.columns_t_)} vs {len(colattr)}')
             new_columns_t_ = []
