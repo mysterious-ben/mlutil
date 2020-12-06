@@ -120,7 +120,7 @@ class ColumnSelector(TransformerMixin, BaseEstimator):
             if isinstance(X_t, pd.DataFrame):
                 X_t = X_t.values
             new_columns_t_ = self._infer_new_column_names(X_t)
-            X_t_ = pd.DataFrame(X_t, columns=new_columns_t_)
+            X_t_ = pd.DataFrame(X_t, index=X.index, columns=new_columns_t_)
         X_l = X[self.columns_l_]
         X_new = X_l.join(X_t_)
         if set(X_new.columns) == set(self.columns_):
