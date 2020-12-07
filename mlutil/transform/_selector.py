@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import pandas as pd
 import numpy as np
 from sklearn.base import TransformerMixin, BaseEstimator
-from typing import Optional, List
+from typing import Optional
 
 
 class ColumnSelector(TransformerMixin, BaseEstimator):
@@ -30,7 +32,7 @@ class ColumnSelector(TransformerMixin, BaseEstimator):
     """
 
     def __init__(self, transformer=None,
-                 columns: Optional[List[str]] = None,
+                 columns: Optional[list[str]] = None,
                  columns_regex: Optional[str] = None,
                  columns_like: Optional[str] = None,
                 #  infer_new_columns: Literal['same', 'attr', 'same_attr', 'num', 'auto'] = 'same',
@@ -72,7 +74,7 @@ class ColumnSelector(TransformerMixin, BaseEstimator):
         self.transformer.fit(X=X[self.columns_t_], y=y)
         return self
 
-    def _infer_new_column_names(self, X_t: np.array) -> List[str]:
+    def _infer_new_column_names(self, X_t: np.array) -> list[str]:
         actual = X_t.shape[1]
         if self.infer_new_columns == 'auto':
             raise NotImplementedError(f'{self.infer_new_columns}')
