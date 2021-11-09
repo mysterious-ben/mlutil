@@ -15,6 +15,7 @@ loguru = "^0.5.3"
 matplotlib = "^3.4.3"
 scikit-learn = "^1.0.1"
 scikit-optimize = "^0.9.0"
+pre-commit = "^2.15.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
@@ -22,7 +23,46 @@ pylint = "^2.11.1"
 flake8 = "^4.0.1"
 black = "^21.10b0"
 mypy = "^0.910"
+pre-commit = "^2.15.0"
+isort = "^5.10.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line_length = 99
+target_version = ['py38']
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.github
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | \notebooks
+    | .ipynb_checkpoints
+    | __pycache__
+    | data
+    | logs
+    | _build
+    | buck-out
+    | build
+    | dist
+    | snapshots
+    | \.venv
+  )/
+)
+'''
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: integration testing (tests require valid credentials and can be slow)",
+]
+testpaths = [
+    "tests",
+]

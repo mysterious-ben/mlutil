@@ -1,13 +1,14 @@
-import pytest
 import numpy as np
 import pandas as pd
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import OneHotEncoder, PolynomialFeatures
+import pytest
 from sklearn.decomposition import PCA
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression
-from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
-from mlutil.transform import SigmaClipper, QuantileClipper, ColumnSelector
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, PolynomialFeatures
+
+from mlutil.transform import ColumnSelector, QuantileClipper, SigmaClipper
 
 
 @pytest.mark.parametrize(
