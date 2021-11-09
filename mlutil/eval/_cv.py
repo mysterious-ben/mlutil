@@ -80,29 +80,37 @@ class TimeSeriesSplit(SimpleRepr):
             yield train_ids, test_ids
 
     @staticmethod
-    def _to_points(x, n_points):
-        if x is None:
-            return x
-        elif isinstance(x, int):
-            assert x < n_points
-            return x
+    def _to_points(n: Union[int, float], n_total_points: int) -> Optional[int]:
+        if isinstance(n, int):
+            if n >= n_total_points:
+                raise AssertionError(f"{n} >= {n_total_points} (must be less)")
+            n_points = n
+        elif isinstance(n, float):
+            if n >= 1.0:
+                raise AssertionError(f"{n} >= 1.0 (must be less)")
+            n_points = int(n * n_total_points)
         else:
-            assert x < 1.0
-            return int(x * n_points)
+            raise ValueError(f"Type of {n} must be int or float")
+        return n_points
 
     def split(self, X, y=None, groups=None):
-        n_points = len(X)
+        n_total = len(X)
         return self._cv_gen(
-            last_idx=n_points - 1,
-            test_size=self._to_points(self.test_size, n_points),
-            train_size=self._to_points(self.train_size, n_points),
-            predict_size=self._to_points(self.predict_size, n_points),
-            predict_step=self._to_points(self.predict_step, n_points),
-            predict_lag=self._to_points(self.predict_lag, n_points),
-            drop_first_points=self._to_points(self.drop_first_points, n_points),
-            drop_last_points=self._to_points(self.drop_last_points, n_points),
+            last_idx=n_total - 1,
+            test_size=self._to_points(self.test_size, n_total),
+            train_size=(
+                None if self.train_size is None else self._to_points(self.train_size, n_total)
+            ),
+            predict_size=self._to_points(self.predict_size, n_total),
+            predict_step=self._to_points(self.predict_step, n_total),
+            predict_lag=self._to_points(self.predict_lag, n_total),
+            drop_first_points=self._to_points(self.drop_first_points, n_total),
+            drop_last_points=self._to_points(self.drop_last_points, n_total),
         )
 
     def get_n_splits(self, X, y=None, groups=None):
-        n_splits = self.test_size // self.predict_step
+        n_total = len(X)
+        n_splits = self._to_points(self.test_size, n_total) // self._to_points(
+            self.predict_step, n_total
+        )
         return n_splits
