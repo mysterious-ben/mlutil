@@ -1,4 +1,5 @@
 import numpy as np
+
 from mlutil.model import GAM
 
 
@@ -10,4 +11,4 @@ def test_GAM():
     X_test = np.arange(15, 25)[:, None]
     y_test = np.arange(15, 25)
     y_hat = m.predict(X_test)
-    np.testing.assert_allclose(y_test, y_hat, atol=1.)
+    np.testing.assert_allclose(y_test, y_hat, atol=1.0)

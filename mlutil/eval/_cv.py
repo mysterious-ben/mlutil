@@ -1,4 +1,5 @@
 from typing import Optional, Union
+
 from mlutil._util import SimpleRepr
 
 
@@ -52,26 +53,30 @@ class TimeSeriesSplit(SimpleRepr):
         predict_lag: int,
         predict_step: int,
         drop_first_points: int,
-        drop_last_points: int
+        drop_last_points: int,
     ):
         last_end_test_idx = last_idx - drop_last_points
         last_end_train_idx = last_end_test_idx - predict_size - predict_lag
         first_end_train_idx = last_end_train_idx - test_size + predict_step
-        first_end_train_idx = first_end_train_idx + (last_end_train_idx - first_end_train_idx) % predict_step
+        first_end_train_idx = (
+            first_end_train_idx + (last_end_train_idx - first_end_train_idx) % predict_step
+        )
         if first_end_train_idx < drop_first_points:
-            raise AssertionError(f"First training interval is empty: "
-                                 f"{first_end_train_idx} < {drop_first_points}")
+            raise AssertionError(
+                f"First training interval is empty: "
+                f"{first_end_train_idx} < {drop_first_points}"
+            )
 
-        for end_train_idx in range(first_end_train_idx, last_end_train_idx + 1,
-                                   predict_step):
+        for end_train_idx in range(first_end_train_idx, last_end_train_idx + 1, predict_step):
             if train_size is not None:
                 start_train_idx = max(end_train_idx - train_size + 1, drop_first_points)
             else:
                 start_train_idx = drop_first_points
-            train_ids = slice(start_train_idx,
-                              min(end_train_idx, last_idx) + 1)
-            test_ids = slice(end_train_idx + predict_lag + 1,
-                             min(end_train_idx + predict_lag + predict_size, last_idx) + 1)
+            train_ids = slice(start_train_idx, min(end_train_idx, last_idx) + 1)
+            test_ids = slice(
+                end_train_idx + predict_lag + 1,
+                min(end_train_idx + predict_lag + predict_size, last_idx) + 1,
+            )
             yield train_ids, test_ids
 
     @staticmethod
@@ -82,7 +87,7 @@ class TimeSeriesSplit(SimpleRepr):
             assert x < n_points
             return x
         else:
-            assert x < 1.
+            assert x < 1.0
             return int(x * n_points)
 
     def split(self, X, y=None, groups=None):
@@ -97,7 +102,7 @@ class TimeSeriesSplit(SimpleRepr):
             drop_first_points=self._to_points(self.drop_first_points, n_points),
             drop_last_points=self._to_points(self.drop_last_points, n_points),
         )
- 
+
     def get_n_splits(self, X, y=None, groups=None):
         n_splits = self.test_size // self.predict_step
         return n_splits
