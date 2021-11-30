@@ -78,7 +78,7 @@ class ColumnSelector(TransformerMixin, BaseEstimator):
         self.transformer.fit(X=X[self.columns_t_], y=y)
         return self
 
-    def _infer_new_column_names(self, X_t: np.array) -> list[str]:
+    def _infer_new_column_names(self, X_t: np.ndarray) -> list[str]:
         actual = X_t.shape[1]
         if self.infer_new_columns == "auto":
             raise NotImplementedError(f"{self.infer_new_columns}")
@@ -88,6 +88,7 @@ class ColumnSelector(TransformerMixin, BaseEstimator):
                 raise ValueError(f"Wrong number of transformed columns: {expected} vs {actual}")
             new_columns_t_ = self.columns_t_
         elif self.infer_new_columns == "attr":
+            assert self.new_columns_attr is not None
             colattr = getattr(self.transformer, self.new_columns_attr)
             expected = len(colattr)
             if expected != actual:
@@ -99,6 +100,7 @@ class ColumnSelector(TransformerMixin, BaseEstimator):
             )
             new_columns_t_ = [prefix + "_" + str(x) for x in colattr]
         elif self.infer_new_columns == "same_attr":
+            assert self.new_columns_attr is not None
             colattr = getattr(self.transformer, self.new_columns_attr)
             expected = sum(len(x) for x in colattr)
             if expected != actual:
