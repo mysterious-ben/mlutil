@@ -28,16 +28,16 @@ class SigmaClipper(TransformerMixin, BaseEstimator):
         self.high_sigma = high_sigma
         self.mean_fun = mean_fun
 
-    def fit(self, X: Union[np.array, pd.DataFrame], y=None):
+    def fit(self, X: Union[np.ndarray, pd.DataFrame], y=None):
         self.low_sigma_ = self.sigma if self.low_sigma is None else self.low_sigma
         self.high_sigma_ = self.sigma if self.high_sigma is None else self.high_sigma
-        assert self.low_sigma_ >= 0
-        assert self.high_sigma_ >= 0
+        assert (self.low_sigma_ is not None) and (self.low_sigma_ >= 0)
+        assert (self.high_sigma_ is not None) and (self.high_sigma_ >= 0)
 
         if self.mean_fun == "median":
             meanf = np.nanmedian
         elif self.mean_fun == "mean":
-            meanf = np.nanmean
+            meanf = np.nanmean  # type: ignore
         else:
             raise ValueError(self.mean_fun)
         X_ = np.asarray(X)
@@ -47,7 +47,7 @@ class SigmaClipper(TransformerMixin, BaseEstimator):
         self.low_ = self.mean_ - self.high_sigma_ * self.std_
         return self
 
-    def transform(self, X: Union[np.array, pd.DataFrame]) -> Union[np.array, pd.DataFrame]:
+    def transform(self, X: Union[np.ndarray, pd.DataFrame]) -> Union[np.ndarray, pd.DataFrame]:
         if isinstance(X, pd.DataFrame):
             X = X.clip(self.low_, self.high_, axis=1)
         else:
@@ -66,7 +66,7 @@ class QuantileClipper(TransformerMixin, BaseEstimator):
 
     def __init__(
         self,
-        factor: Optional[float] = 3.0,
+        factor: float = 3.0,
         low_quantile: Optional[float] = 0.9,
         high_quantile: Optional[float] = 0.1,
         mean_fun: str = "median",
@@ -76,7 +76,7 @@ class QuantileClipper(TransformerMixin, BaseEstimator):
         self.high_quantile = high_quantile
         self.mean_fun = mean_fun
 
-    def fit(self, X: Union[np.array, pd.DataFrame], y=None):
+    def fit(self, X: Union[np.ndarray, pd.DataFrame], y=None):
         assert self.factor >= 0
         X_ = np.asarray(X)
         self.mean_ = np.nanmedian(X_, axis=0)
@@ -86,7 +86,7 @@ class QuantileClipper(TransformerMixin, BaseEstimator):
         self.low_ = (self.low_q_ - self.mean_) * self.factor + self.mean_
         return self
 
-    def transform(self, X: Union[np.array, pd.DataFrame]) -> Union[np.array, pd.DataFrame]:
+    def transform(self, X: Union[np.ndarray, pd.DataFrame]) -> Union[np.ndarray, pd.DataFrame]:
         if isinstance(X, pd.DataFrame):
             X = X.clip(self.low_, self.high_, axis=1)
         else:
