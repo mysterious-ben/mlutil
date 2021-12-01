@@ -1,6 +1,7 @@
 from typing import List, Union
 
 import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator, RegressorMixin
 from statsmodels.gam.api import BSplines, CyclicCubicSplines, GLMGam
 
@@ -8,7 +9,7 @@ from statsmodels.gam.api import BSplines, CyclicCubicSplines, GLMGam
 class GAM(RegressorMixin, BaseEstimator):
     """Generalized Additive Models
 
-    :param splines: type of sline functions
+    :param splines: type of spline functions
         'cyclic_cubic' | 'b'
     :param df: number of spline basis functions (= knots)
         if splines='cyclic_cubic', must be set to 3 (default value)
@@ -36,8 +37,7 @@ class GAM(RegressorMixin, BaseEstimator):
         self.splines = splines
         self.clip_X = clip_X
 
-    def fit(self, X, y):
-        X = np.array(X)
+    def fit(self, X: Union[pd.DataFrame, np.ndarray], y: Union[pd.Series, np.ndarray]):
         assert not (self.splines == "cyclic_cubic") or (self.degree == 3)
         df = self.df if isinstance(self.df, list) else [self.df] * X.shape[1]
         degree = self.degree if isinstance(self.degree, list) else [self.degree] * X.shape[1]
@@ -54,7 +54,14 @@ class GAM(RegressorMixin, BaseEstimator):
         self.res_ = self.estimator_.fit()
         return self
 
-    def predict(self, X):
+    def predict(self, X: Union[pd.DataFrame, np.ndarray]):
         if self.clip_X:
             X = np.clip(X, self.x_min_, self.x_max_)
         return self.res_.predict(X, exog_smooth=X)
+
+    def summary(self):
+        return self.res_.summary()
+
+    @property
+    def feature_names(self) -> List[str]:
+        return self.estimator_.exog_names
