@@ -124,7 +124,11 @@ class ColumnSelector(TransformerMixin, BaseEstimator):
         return new_columns_t_
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        assert list(X.columns) == self.columns_
+        if list(X.columns) != self.columns_:
+            raise ValueError(
+                f"Columns are different from training: "
+                f"new={list(X.columns)} vs old={self.columns_}"
+            )
         if self.transform is None:
             return X
         if self.copy:
@@ -138,7 +142,7 @@ class ColumnSelector(TransformerMixin, BaseEstimator):
             new_columns_t_ = self._infer_new_column_names(X_t)
             X_t_ = pd.DataFrame(X_t, index=X.index, columns=new_columns_t_)
         X_l = X[self.columns_l_]
-        X_new = X_l.join(X_t_)
+        X_new = pd.concat([X_l, X_t_], axis=1)
         if set(X_new.columns) == set(self.columns_):
             X_new = X_new[self.columns_]
         self.new_columns_ = list(X_new.columns)
