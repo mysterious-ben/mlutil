@@ -36,11 +36,11 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with isort (check only)
       run: |
-        pip install isort==5.9.2
+        pip install isort==5.10.1
         isort . --check-only
     - name: Lint with black (check only)
       run: |
-        pip install black==20.8b1
+        pip install black==21.12b0
         black . --check
     - name: Lint with flake8
       run: |
