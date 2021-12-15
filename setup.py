@@ -36,6 +36,7 @@ setup(
         "setuptools",
         "numpy",
         "pandas",
+        "pygam",
         "statsmodels",
         "scikit-learn",
     ],
