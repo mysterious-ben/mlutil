@@ -53,7 +53,7 @@ jobs:
     - name: Lint with pylint
       run: |
         pip install pylint==2.10.2
-        pylint mlutil/ -d C,R
+        pylint mlutil/ -E
     - name: Run test suite
       run: |
         pip install pytest==6.2.3
