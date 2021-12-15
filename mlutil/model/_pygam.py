@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -12,7 +12,7 @@ from sklearn.base import BaseEstimator, RegressorMixin
 class GAM(RegressorMixin, BaseEstimator):
     def __init__(
         self,
-        terms: Union[Literal["auto"], Term] = "auto",
+        terms: Union[str, Term] = "auto",
         distribution: Union[str, Distribution] = "normal",
         link: str = "identity",
         fit_intercept: bool = True,
@@ -22,7 +22,7 @@ class GAM(RegressorMixin, BaseEstimator):
         lam: Union[float, List] = 0.6,
         n_splines: int = 25,
         spline_order: int = 3,
-        penalties: Union[Literal["auto"], List] = "auto",
+        penalties: Union[str, List] = "auto",
         dtype: str = "numerical",
         max_iter: int = 100,
         tol: float = 1e-4,
