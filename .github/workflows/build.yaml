@@ -56,7 +56,7 @@ jobs:
         pylint mlutil/ -E
     - name: Run test suite
       run: |
-        pip install pytest==6.2.3
+        pip install pytest==7.1.3
         pytest -vv -m "not integration"
     - name: Build python package
       run: |
